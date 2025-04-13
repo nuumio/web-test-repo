@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Test</title>
+    <title>Viewport size</title>
     <style>
       body {
         --ruler-num-c: #888;
@@ -93,7 +93,8 @@
       body {
         height: 100vh;
         margin: 0;
-        font-family: sans-serif;
+        font-family: monospace;
+        font-size 16px;
         padding-top: 50px;
         box-sizing: border-box;
       }
@@ -102,13 +103,16 @@
         margin: 8px 8px 0px 50px;
         max-width: 305px;
       }
-      .testpage {
+      .pageid, .no-page-id {
         margin-top: 0px;
       }
       .note {
         margin-top: 16px;
-        font-size: 75%;
+        font-size: 10px;
         opacity: 0.38;
+      }
+      .hide {
+        display: none;
       }
     </style>
   </head>
@@ -119,18 +123,43 @@
     <ul class="ruler-y">
       <li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li>
     </ul>
-    <section class="testpage">Test page</section>
-    <section class="dimensions"><span id="width"></span> x <span id="height"></span></section>
+    <section class="withid pageid hide">Page id: <span id="pageid"></span></section>
+    <section class="woid no-pageid hide">No page id, size won't be stored</section>
+    <section class="dimensions">
+      <div class="current">Current: <span id="width"></span> x <span id="height"></span></div>
+      <div class="withid previous hide">&nbsp;&nbsp;Prev.: <span id="prev-width">???</span> x <span id="prev-height">???</span></div>
+    </section>
+    <section class="withid note hide">Previous size is stored in a cookie.</section>
     <section class="note"><div>Rulers based on</div><div><a href="https://dev.to/madsstoumann/build-a-css-ruler-2opn">https://dev.to/madsstoumann/build-a-css-ruler-2opn</a></div></section>
     <script type="module">
+      const hash = window.location.hash;
       const spanWidth = document.querySelector('#width');
       const spanHeight = document.querySelector('#height');
-      const hash = window.location.hash;
-      if (hash) {
+      function readId () {
+        const hash = window.location.hash;
+        if (hash) {
+          try {
+            return decodeURIComponent(hash.replace('#', '')).trim();
+          } catch (e) {
+            return null;
+          }
+        }
+        return null;
+      }
+      let id =readId();
+      function getAllDimensionData() {
         try {
-          document.querySelector('.testpage').textContent = decodeURIComponent(hash.replace('#', ''));
+          const json = document.cookie
+            .split("; ")
+            .find((row) => row.startsWith("prevSessionDimensions="))
+            ?.split("=")[1];
+          const jsonValue = JSON.parse(json);
+          if (typeof jsonValue == 'object' && !!jsonValue) {
+            return jsonValue;
+          }
+          return {};
         } catch (e) {
-          document.querySelector('.testpage').textContent = 'Test page (error decoding hash)';
+          return {};
         }
       }
       function updateDimensions() {
@@ -138,9 +167,69 @@
         const h = window.innerHeight;
         spanWidth.textContent = `${w}px`;
         spanHeight.textContent = `${h}px`;
+        if (!id) return;
+        const allData = getAllDimensionData();
+        allData[id] = {"width": w, "height": h};
+        document.cookie=`prevSessionDimensions=${JSON.stringify(allData)}; Max-Age=3600;`;
       }
-      updateDimensions();
+      function readPrevDimension() {
+        if (!id) {
+          return [null, null];
+        }
+        try {
+          const allData = getAllDimensionData();
+          const data = allData[id];
+          if (!data) {
+            throw 'no data';
+          }
+
+          if (typeof data == 'object' && !!data && typeof data['width'] == 'number' && typeof data['height'] == 'number') {
+            return [data['width'], data['height']];
+          }
+          throw 'invalid data';
+        } catch (e) {
+          return [null, null];
+        }
+      }
+      function initView() {
+        if (!!id) {
+          Array.from(document.querySelectorAll('.withid')).forEach((e) => {
+            e.classList.remove('hide');
+            e.classList.add('show')
+          });
+          Array.from(document.querySelectorAll('.woid')).forEach((e) => {
+            e.classList.remove('show');
+            e.classList.add('hide')
+          });
+          document.querySelector('#pageid').textContent = id;
+          document.title = `Viewport size of ${id}`;
+        } else {
+          Array.from(document.querySelectorAll('.woid')).forEach((e) => {
+            e.classList.remove('hide');
+            e.classList.add('show')
+          });
+          Array.from(document.querySelectorAll('.withid')).forEach((e) => {
+            e.classList.remove('show');
+            e.classList.add('hide')
+          });
+          document.title = `Viewport size`;
+        }
+        const [prevWidht, prevHeight] = readPrevDimension();
+        if (typeof prevWidht == 'number' && typeof prevHeight == 'number') {
+          document.querySelector('#prev-width').textContent = `${prevWidht}px`;
+          document.querySelector('#prev-height').textContent = `${prevHeight}px`;
+        } else {
+          document.querySelector('#prev-width').textContent = `???`;
+          document.querySelector('#prev-height').textContent = `???`;
+        }
+        updateDimensions();
+      }
+      initView();
       addEventListener('resize', (event) => updateDimensions());
+      window.addEventListener('hashchange', function () {
+        id = readId();
+        initView();
+      });
     </script>
   </body>
 </html>
