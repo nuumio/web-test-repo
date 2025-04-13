@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Test</title>
+    <style>
+      body {
+        --ruler-num-c: #888;
+        --ruler-num-fz: 10px;
+        --ruler-num-pi: 0.75ch;
+        --ruler-unit: 1px;
+        --ruler-x: 1;
+        --ruler-y: 1;
+
+        --ruler1-bdw: 1px;
+        --ruler1-c:  #BBB;
+        --ruler1-h: 8px;
+        --ruler1-space: 5;
+
+        --ruler2-bdw: 1px;
+        --ruler2-c:  #BBB;
+        --ruler2-h: 20px;
+        --ruler2-space: 50;
+
+        background-attachment: fixed;
+        background-image:
+          linear-gradient(90deg, var(--ruler1-c) 0 var(--ruler1-bdw), transparent 0),
+          linear-gradient(90deg, var(--ruler2-c) 0 var(--ruler2-bdw), transparent 0),
+          linear-gradient(0deg, var(--ruler1-c) 0 var(--ruler1-bdw), transparent 0),
+          linear-gradient(0deg, var(--ruler2-c) 0 var(--ruler2-bdw), transparent 0);
+        background-position: 0 0;
+        background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
+        background-size:
+          calc(var(--ruler-unit) * var(--ruler1-space) * var(--ruler-x)) var(--ruler1-h),
+          calc(var(--ruler-unit) * var(--ruler2-space) * var(--ruler-x)) var(--ruler2-h),
+          var(--ruler1-h) calc(var(--ruler-unit) * var(--ruler1-space) * var(--ruler-y)),
+          var(--ruler2-h) calc(var(--ruler-unit) * var(--ruler2-space) * var(--ruler-y));
+      }
+
+      /* Ruler Numbers */
+      .ruler-x,
+      .ruler-y {
+        color: var(--ruler-num-c);
+        counter-reset: d 0;
+        display: flex;
+        font-size: var(--ruler-num-fz);
+        line-height: 1;
+        list-style: none;
+        margin: 0;
+        overflow: hidden;
+        padding: 0;
+        position: fixed;
+      }
+      .ruler-x {
+        height: var(--ruler2-h);
+        inset-block-start: 0;
+        inset-inline-start: calc(var(--ruler-unit) * var(--ruler2-space));
+        inset-inline-start: 0;
+        opacity: var(--ruler-x);
+        width: 100%;
+      }
+      .ruler-y {
+        flex-direction: column;
+        height: 100%;
+        inset-block-start: 0;
+        inset-inline-start: 0;
+        opacity: var(--ruler-y);
+        width: var(--ruler2-h);
+      }
+      .ruler-x li {
+        align-self: flex-end;
+      }
+      .ruler-x li,
+      .ruler-y li {
+        counter-increment: d var(--ruler2-space);
+        flex: 0 0 calc(var(--ruler-unit) * var(--ruler2-space));
+      }
+      .ruler-x li::after {
+        content: counter(d)"\00a0";
+        display: block;
+        line-height: 1;
+        text-align: end;
+      }
+      .ruler-y li::after {
+        content: "\00a0"counter(d);
+        display: block;
+        transform: rotate(-90deg) translateX(-100%) translateY(10px);
+        transform-origin: 0% 0%;
+        text-align: start;
+        width: calc(var(--ruler-unit) * var(--ruler2-space));
+      }
+
+      /* Additional css for test page */
+      body {
+        height: 100vh;
+        margin: 0;
+        font-family: sans-serif;
+        padding-top: 50px;
+        box-sizing: border-box;
+      }
+      section {
+        box-sizing: border-box;
+        margin: 8px 8px 0px 50px;
+        max-width: 305px;
+      }
+      .testpage {
+        margin-top: 0px;
+      }
+      .note {
+        margin-top: 16px;
+        font-size: 75%;
+        opacity: 0.38;
+      }
+    </style>
+  </head>
+  <body>
+    <ul class="ruler-x">
+      <li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li>
+    </ul>
+    <ul class="ruler-y">
+      <li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li>
+    </ul>
+    <section class="testpage">Test page</section>
+    <section class="dimensions"><span id="width"></span> x <span id="height"></span></section>
+    <section class="note"><div>Rulers based on</div><div><a href="https://dev.to/madsstoumann/build-a-css-ruler-2opn">https://dev.to/madsstoumann/build-a-css-ruler-2opn</a></div></section>
+    <script type="module">
+      const spanWidth = document.querySelector('#width');
+      const spanHeight = document.querySelector('#height');
+      const hash = window.location.hash;
+      if (hash) {
+        try {
+          document.querySelector('.testpage').textContent = decodeURIComponent(hash.replace('#', ''));
+        } catch (e) {
+          document.querySelector('.testpage').textContent = 'Test page (error decoding hash)';
+        }
+      }
+      function updateDimensions() {
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+        spanWidth.textContent = `${w}px`;
+        spanHeight.textContent = `${h}px`;
+      }
+      updateDimensions();
+      addEventListener('resize', (event) => updateDimensions());
+    </script>
+  </body>
+</html>
